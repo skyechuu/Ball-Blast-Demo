@@ -44,9 +44,9 @@ public class Ball : MonoBehaviour
         ResetBall();
     }
 
-    void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider collider)
     {
-        switch (other.gameObject.tag)
+        switch (collider.gameObject.tag)
         {
             case "Ground":
                 Bounce();
@@ -56,6 +56,9 @@ public class Ball : MonoBehaviour
                 break;
             case "Wall_L":
                 SidewayBounce(false);
+                break;
+            case "Bullet":
+                OnHitByBullet(collider);
                 break;
         }
     }
@@ -108,6 +111,14 @@ public class Ball : MonoBehaviour
     {
         // callback for sound, gfx, etc...
         //Debug.Log("Boink!");
+    }
+
+    void OnHitByBullet(Collider collider)
+    {
+        Bullet bullet = collider.GetComponent<Bullet>();
+        bullet.Despawn();
+
+        transform.gameObject.SetActive(false);
     }
 
     /// <summary>

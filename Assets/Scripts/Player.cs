@@ -2,30 +2,43 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(PlayerInput))]
 public class Player : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] Transform muzzle;
     [SerializeField] Bullet bulletPrefab;
 
-    [Header("Combat properties")]
+    [Header("Properties")]
     [SerializeField] float rpm;
-
+    [SerializeField] float smoothness;
+    
     float nextShootTime;
+    Vector3 currentVelocity;
 
-    void Start()
+    void Awake()
     {
     }
 
     void Update()
     {
-        if (Input.GetMouseButton(0))
+        if (PlayerInput.IsInputContinues)
         {
+            Move();
             Shoot();
         }
     }
 
-    public void Shoot()
+    void Move()
+    {
+        // Clamp new position into game area
+        float targetX = Mathf.Clamp(PlayerInput.InputPosition().x, -2.5f, 2.5f);
+        Vector3 newPosition = transform.position;
+        newPosition.x = targetX;
+        transform.position = Vector3.SmoothDamp(transform.position, newPosition, ref currentVelocity, smoothness);
+    }
+
+    void Shoot()
     {
         if (Time.time > nextShootTime)
         {

@@ -25,7 +25,7 @@ public class BallSpawner : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.P))
         {
-            SpawnBall(Random.Range(1, 10), (int)(Time.time * 100) % 2 == 0, Random.Range(2, 4), Random.Range(4, 8));
+            SpawnBall(Random.Range(1, 10), (int)(Time.time * 100) % 2 == 0, Random.Range(2, 4), Random.Range(5, 8));
         }
     }
 
