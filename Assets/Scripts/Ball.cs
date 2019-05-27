@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,12 +9,12 @@ public class Ball : MonoBehaviour
     [SerializeField] float bounceHeight = 8f;
     [SerializeField] float horizontalSpeed = 1f;
     [SerializeField] int hitPoint = 1;
-
     float gravity = -9.8f;
+    bool isLeft = false;
+
+    bool isBallReady = false;
     float velocityY;
     float velocityX;
-    bool isLeft = false;
-    bool isBallReady = false;
 
     void Awake()
     {
@@ -36,6 +37,11 @@ public class Ball : MonoBehaviour
         CheckBallReadiness();
 
         Move();
+    }
+
+    void OnEnable()
+    {
+        ResetBall();
     }
 
     void OnTriggerEnter(Collider other)
@@ -118,6 +124,13 @@ public class Ball : MonoBehaviour
         Vector3 size = transform.localScale;
 
         isBallReady = (pos.x >= platformLeft + size.x) && (pos.x <= platformRight - size.x);
+    }
+
+    private void ResetBall()
+    {
+        isBallReady = false;
+        velocityX = 0;
+        velocityY = 0;
     }
 
     /// <summary>
