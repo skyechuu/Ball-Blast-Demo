@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class BallSpawner : MonoBehaviour
 {
+    public static BallSpawner instance;
+
     [SerializeField] int ballPreloadAmount = 10;
     [SerializeField] GameObject ballPrefab;
 
@@ -12,6 +14,7 @@ public class BallSpawner : MonoBehaviour
 
     void Awake()
     {
+        instance = this;
         ballPool = new List<Ball>();
     }
     
@@ -36,7 +39,7 @@ public class BallSpawner : MonoBehaviour
     /// <param name="horizontalSpeed">Default 1 unity per second.</param>
     /// <param name="bounceHeight">Default 8 unit, which is 1 unit less than height of the side walls.</param>
     /// <param name="hitPoint">Hit point of the ball.</param>
-    Ball SpawnBall(int hitPoint = 1, bool initialDirection = false, float horizontalSpeed = 1f, float bounceHeight = 8f)
+    public Ball SpawnBall(int hitPoint = 1, bool initialDirection = false, float horizontalSpeed = 1f, float bounceHeight = 8f)
     {
         float positionX = 3.5f * (initialDirection ? 1 : -1);
         Vector3 spawnPosition = new Vector3(positionX, transform.position.y, 0);
@@ -48,6 +51,7 @@ public class BallSpawner : MonoBehaviour
         ball.SetHorizontalSpeed(horizontalSpeed);
         ball.SetBounceHeight(bounceHeight);
         ball.gameObject.SetActive(true);
+        ball.SetIsParent(true);
 
         return ball;
     }
@@ -60,7 +64,7 @@ public class BallSpawner : MonoBehaviour
     /// <param name="horizontalSpeed">Default 1 unity per second.</param>
     /// <param name="bounceHeight">Default 9 unit, which is also size of the side walls.</param>
     /// <param name="hitPoint">Hit point of the ball.</param>
-    Ball SpawnBall(Ball parent, int hitPoint = 1, bool initialDirection = false, float horizontalSpeed = 1f, float bounceHeight = 9f)
+    public Ball SpawnBall(Ball parent, int hitPoint = 1, bool initialDirection = false, float horizontalSpeed = 1f, float bounceHeight = 9f)
     {
         Vector3 spawnPosition =  parent.transform.position;
 

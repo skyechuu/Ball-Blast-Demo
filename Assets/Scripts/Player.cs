@@ -32,7 +32,7 @@ public class Player : MonoBehaviour
     void Move()
     {
         // Clamp new position into game area
-        float targetX = Mathf.Clamp(PlayerInput.InputPosition().x, -2.5f, 2.5f);
+        float targetX = Mathf.Clamp(PlayerInput.InputPosition().x, -GameConstants.MAX_HORIZONTAL_DIMENSION_FOR_PLAYER, GameConstants.MAX_HORIZONTAL_DIMENSION_FOR_PLAYER);
         Vector3 newPosition = transform.position;
         newPosition.x = targetX;
         transform.position = Vector3.SmoothDamp(transform.position, newPosition, ref currentVelocity, smoothness);

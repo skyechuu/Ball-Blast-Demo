@@ -13,6 +13,7 @@ public class Ball : MonoBehaviour
     bool isLeft = false;
 
     bool isBallReady = false;
+    bool isParent = false;
     float velocityY;
     float velocityX;
 
@@ -42,6 +43,7 @@ public class Ball : MonoBehaviour
     void OnEnable()
     {
         ResetBall();
+        CheckBallReadiness();
     }
 
     void OnTriggerEnter(Collider collider)
@@ -80,11 +82,29 @@ public class Ball : MonoBehaviour
     }
 
     /// <summary>
-    /// Bounces ball by calculating kinematic equation with gravity and desired bounceHeight and calls corresponding callback function at the end.
+    /// Bounces ball by calculating kinematic equation with gravity and ball's bounceHeight and calls corresponding callback function at the end.
     /// </summary>
     void Bounce()
     {
-        float bounceVel = Mathf.Sqrt(-2 * gravity * bounceHeight);
+        Bounce(bounceHeight);
+    }
+
+    /// <summary>
+    /// Bounces ball by calculating kinematic equation with gravity and desired bounceHeight and calls corresponding callback function at the end.
+    /// </summary>
+    public void Bounce(float bounceHeight)
+    {
+        if (!isBallReady)
+            return;
+        
+        float targetBounceHeight = bounceHeight;
+        float currentHeight = transform.position.y;
+
+        // Prevent throwing ball out of game area with bounce
+        if (currentHeight + targetBounceHeight > GameConstants.MAX_GAME_AREA_HEIGHT)
+            targetBounceHeight = GameConstants.MAX_GAME_AREA_HEIGHT - currentHeight;
+
+        float bounceVel = Mathf.Sqrt(-2 * gravity * targetBounceHeight);
         velocityY = bounceVel;
 
         OnBounce();
@@ -118,7 +138,26 @@ public class Ball : MonoBehaviour
         Bullet bullet = collider.GetComponent<Bullet>();
         bullet.Despawn();
 
-        transform.gameObject.SetActive(false);
+        hitPoint--;
+
+        if(hitPoint <= 0)
+        {
+            transform.gameObject.SetActive(false);
+
+            if (isParent)
+            {
+                Split();
+            }
+        }
+    }
+
+    void Split()
+    {
+        var ChildL = BallSpawner.instance.SpawnBall(this, 5, true, 3, bounceHeight);
+        ChildL.Bounce(GameConstants.SPLIT_BOUNCE_HEIGHT);
+        var ChildR = BallSpawner.instance.SpawnBall(this, 5, false, 3, bounceHeight);
+        ChildR.Bounce(GameConstants.SPLIT_BOUNCE_HEIGHT);
+        isParent = false;
     }
 
     /// <summary>
@@ -129,8 +168,8 @@ public class Ball : MonoBehaviour
         if (isBallReady)
             return;
 
-        float platformLeft = -3.5f;
-        float platformRight = 3.5f;
+        float platformLeft = -GameConstants.MAX_HORIZONTAL_DIMENSION_FOR_BALL;
+        float platformRight = GameConstants.MAX_HORIZONTAL_DIMENSION_FOR_BALL;
         Vector3 pos = transform.position;
         Vector3 size = transform.localScale;
 
@@ -166,6 +205,11 @@ public class Ball : MonoBehaviour
     public void SetHitPoint(int hitPoint)
     {
         this.hitPoint = hitPoint;
+    }
+
+    public void SetIsParent(bool isParent)
+    {
+        this.isParent = isParent;
     }
 
 }
