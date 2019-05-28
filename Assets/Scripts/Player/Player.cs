@@ -22,6 +22,9 @@ public class Player : MonoBehaviour
     
     void Update()
     {
+        if (!GameController.LevelManager.GetIsLevelStarted())
+            return;
+
         if (PlayerInput.IsInputContinues && !PlayerInput.IsInputOverUI)
         {
             Move();

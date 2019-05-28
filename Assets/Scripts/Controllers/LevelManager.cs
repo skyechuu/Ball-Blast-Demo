@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
@@ -181,6 +180,11 @@ public class LevelManager : MonoBehaviour
     public void SetIsLevelStarted(bool isLevelStarted)
     {
         this.isLevelStarted = isLevelStarted;
+    }
+
+    public bool GetIsLevelStarted()
+    {
+        return isLevelStarted;
     }
 
     void Debug()
