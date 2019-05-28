@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
@@ -26,6 +27,7 @@ public class LevelManager : MonoBehaviour
 
         Debug();
 
+        //CheckBallHPs();
         HandleWaves();
     }
 
@@ -66,6 +68,20 @@ public class LevelManager : MonoBehaviour
                 GameController.ChangeGameState(GameState.WIN);
             }
         }
+    }
+
+    void CheckBallHPs()
+    {
+        currentTotalHp = 0;
+        int offset = 0;
+        int currentActiveBallHP = 0;
+        var livingBalls = activeBallsInLevel.Where(b => b.gameObject.activeInHierarchy).Select(b => b).ToList();
+        foreach (Ball ball in livingBalls)
+        {
+            offset += ball.GetMaxHitPoint();
+            currentActiveBallHP += ball.GetCurrentHitPoint();
+        }
+        currentTotalHp = (maxTotalHp - offset) + currentActiveBallHP;
     }
 
     void SpawnNextBall()
@@ -111,7 +127,7 @@ public class LevelManager : MonoBehaviour
 
         Ball ball = GameController.GetBallFromPool();
         ball.transform.position = spawnPosition;
-        ball.SetHitPoint(hitPoint);
+        ball.SetMaxHitPoint(hitPoint);
         ball.SetIsLeft(initialDirection);
         ball.SetHorizontalSpeed(horizontalSpeed);
         ball.SetBounceHeight(bounceHeight);
@@ -137,7 +153,7 @@ public class LevelManager : MonoBehaviour
 
         Ball ball = GameController.GetBallFromPool();
         ball.transform.position = spawnPosition;
-        ball.SetHitPoint(hitPoint);
+        ball.SetMaxHitPoint(hitPoint);
         ball.SetIsLeft(initialDirection);
         ball.SetHorizontalSpeed(horizontalSpeed);
         ball.SetBounceHeight(bounceHeight);

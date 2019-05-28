@@ -5,7 +5,8 @@ public class Ball : MonoBehaviour
 {
     [SerializeField] float bounceHeight = 8f;
     [SerializeField] float horizontalSpeed = 1f;
-    [SerializeField] int hitPoint = 1;
+    [SerializeField] int maxHitPoint = 1;
+    [SerializeField] int currentHitPoint = 1;
     float gravity = -9.8f;
     bool isLeft = false;
 
@@ -74,7 +75,6 @@ public class Ball : MonoBehaviour
             velocityY += gravity * Time.deltaTime;
         }
 
-
         // Move the ball
         transform.position += (Vector3.up * velocityY + transform.right * velocityX) * Time.deltaTime;
     }
@@ -104,6 +104,8 @@ public class Ball : MonoBehaviour
             targetBounceHeight = GameConstants.MAX_GAME_AREA_HEIGHT - currentHeight;
 
         float bounceVel = Mathf.Sqrt(-2 * gravity * targetBounceHeight);
+        if (float.IsNaN(bounceVel))
+            bounceVel = 0;
         velocityY = bounceVel;
 
         OnBounce();
@@ -135,21 +137,30 @@ public class Ball : MonoBehaviour
     void OnHitPlayer(Collider collider)
     {
         print("Player hit!");
-        collider.gameObject.SetActive(false);
-        GameController.ChangeGameState(GameState.LOST);
+        //collider.gameObject.SetActive(false);
+        //GameController.ChangeGameState(GameState.LOST);
     }
 
     void OnHitByBullet(Collider collider)
     {
         Bullet bullet = collider.GetComponent<Bullet>();
+        var damage =  bullet.GetDamage();
         bullet.Despawn();
 
-        var damage =  bullet.GetDamage();
-        hitPoint -= damage;
-        GameController.LevelManager.CurrentTotalHP -= damage;
-
-        if (hitPoint <= 0)
+        if (currentHitPoint - damage < 0)
         {
+            GameController.LevelManager.CurrentTotalHP -= currentHitPoint;
+            currentHitPoint = 0;
+        }
+        else
+        {
+            currentHitPoint -= damage;
+            GameController.LevelManager.CurrentTotalHP -= damage;
+        }
+
+        if (currentHitPoint <= 0)
+        {
+            print(currentHitPoint);
             transform.gameObject.SetActive(false);
 
             if (isParent)
@@ -161,9 +172,16 @@ public class Ball : MonoBehaviour
 
     void Split()
     {
-        var ChildL = GameController.LevelManager.SpawnBall(this, leftChildHP, true, 4, bounceHeight);
+        float horizontalSpeed;
+
+        if (!isBallReady)
+            horizontalSpeed = 0;
+        else
+            horizontalSpeed = 4;
+
+        var ChildL = GameController.LevelManager.SpawnBall(this, leftChildHP, true, horizontalSpeed, bounceHeight);
         ChildL.Bounce(GameConstants.SPLIT_BOUNCE_HEIGHT);
-        var ChildR = GameController.LevelManager.SpawnBall(this, rightChildHP, false, 4, bounceHeight);
+        var ChildR = GameController.LevelManager.SpawnBall(this, rightChildHP, false, horizontalSpeed, bounceHeight);
         ChildR.Bounce(GameConstants.SPLIT_BOUNCE_HEIGHT);
         isParent = false;
     }
@@ -181,7 +199,7 @@ public class Ball : MonoBehaviour
         Vector3 pos = transform.position;
         Vector3 size = transform.localScale;
 
-        isBallReady = (pos.x >= platformLeft + size.x/2) && (pos.x <= platformRight - size.x/2);
+        isBallReady = (pos.x >= platformLeft + size.x/2f) && (pos.x <= platformRight - size.x/2f);
     }
 
     private void ResetBall()
@@ -189,6 +207,7 @@ public class Ball : MonoBehaviour
         isBallReady = false;
         velocityX = 0;
         velocityY = 0;
+        currentHitPoint = maxHitPoint;
     }
 
     /// <summary>
@@ -210,9 +229,19 @@ public class Ball : MonoBehaviour
         this.horizontalSpeed = horizontalSpeed;
     }
 
-    public void SetHitPoint(int hitPoint)
+    public void SetMaxHitPoint(int maxHitPoint)
     {
-        this.hitPoint = hitPoint;
+        this.maxHitPoint = maxHitPoint;
+    }
+
+    public int GetCurrentHitPoint()
+    {
+        return currentHitPoint;
+    }
+
+    public int GetMaxHitPoint()
+    {
+        return maxHitPoint;
     }
 
     public void SetParent(int leftChildHP, int rightChildHP)

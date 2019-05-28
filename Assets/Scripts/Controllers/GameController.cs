@@ -131,6 +131,8 @@ public class GameController : MonoBehaviour
     void OnStateWin()
     {
         currentLevelIndex++;
+        player.UpgradeRPM(gameData.bullet_count_increase * 60);
+        player.UpgradeBulletDamage(gameData.bullet_damage_increase);
         viewManager.ActivateWinView();
     }
 

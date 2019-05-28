@@ -59,4 +59,14 @@ public class Player : MonoBehaviour
     {
         return 60f / rpm;
     }
+
+    public void UpgradeRPM(int amount)
+    {
+        rpm += amount;
+    }
+
+    public void UpgradeBulletDamage(int amount)
+    {
+        bulletDamage += amount;
+    }
 }
