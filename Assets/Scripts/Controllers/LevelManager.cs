@@ -107,7 +107,7 @@ public class LevelManager : MonoBehaviour
     {
         Vector3 ballSize = CalculateSizeWithHitPoint(hitPoint);
         float positionX = 3.5f * (initialDirection ? 1 : -1);
-        float positionY = GameConstants.MAX_GAME_AREA_HEIGHT + ballSize.y / 2;
+        float positionY = GameConstants.MAX_GAME_AREA_HEIGHT + ballSize.y / 2 + 0.1f;
         Vector3 spawnPosition = new Vector3(positionX, positionY, 0);
 
         Ball ball = GameController.GetBallFromPool();
