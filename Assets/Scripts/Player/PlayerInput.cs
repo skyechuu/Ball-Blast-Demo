@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerInput : MonoBehaviour
 {
@@ -9,13 +10,9 @@ public class PlayerInput : MonoBehaviour
         cam = Camera.main;
     }
 
-    void Start()
-    {
-    }
-
     void Update()
     {
-        HandleInputs();
+        //HandleInputs();
     }
 
     void HandleInputs()
@@ -71,6 +68,11 @@ public class PlayerInput : MonoBehaviour
 #else
         get { return Input.GetTouch(0).phase == TouchPhase.Ended; }
 #endif
+    }
+
+    public static bool IsInputOverUI
+    {
+        get { return EventSystem.current.IsPointerOverGameObject(-1); }
     }
 
     public static Vector3 InputPosition()

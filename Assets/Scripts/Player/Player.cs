@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(PlayerInput))]
 public class Player : MonoBehaviour
@@ -10,19 +8,16 @@ public class Player : MonoBehaviour
     [SerializeField] Bullet bulletPrefab;
 
     [Header("Properties")]
-    [SerializeField] float rpm;
+    [SerializeField] int rpm;
+    [SerializeField] int bulletDamage;
     [SerializeField] float smoothness;
     
     float nextShootTime;
     Vector3 currentVelocity;
-
-    void Awake()
-    {
-    }
-
+    
     void Update()
     {
-        if (PlayerInput.IsInputContinues)
+        if (PlayerInput.IsInputContinues && !PlayerInput.IsInputOverUI)
         {
             Move();
             Shoot();
@@ -43,8 +38,12 @@ public class Player : MonoBehaviour
         if (Time.time > nextShootTime)
         {
             nextShootTime = Time.time + RpmToSec(rpm);
-            Bullet bullet = Instantiate(bulletPrefab, muzzle.position, muzzle.rotation);
-            bullet.OnSpawn();
+
+            Bullet bullet = GameController.GetBulletFromPool();
+            bullet.transform.position = muzzle.position;
+            bullet.transform.rotation = muzzle.rotation;
+            bullet.SetDamage(bulletDamage);
+            bullet.gameObject.SetActive(true);
         }
     }
 

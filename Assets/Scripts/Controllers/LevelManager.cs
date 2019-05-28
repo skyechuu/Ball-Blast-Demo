@@ -1,35 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-public class BallSpawner : MonoBehaviour
+public class LevelManager : MonoBehaviour
 {
-    public static BallSpawner instance;
 
-    [SerializeField] int ballPreloadAmount = 10;
-    [SerializeField] GameObject ballPrefab;
+    LevelData currentLevelData;
 
-    List<Ball> ballPool;
-
-    void Awake()
-    {
-        instance = this;
-        ballPool = new List<Ball>();
-    }
-    
     void Start()
     {
-        InitializePool();
-        
+        currentLevelData = GameController.GetCurrentLevelData();
     }
-    
+
+
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.P))
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.P))
         {
             SpawnBall(Random.Range(1, 10), (int)(Time.time * 100) % 2 == 0, Random.Range(2, 4), Random.Range(5, 8));
         }
+#endif
     }
 
     /// <summary>
@@ -42,9 +33,9 @@ public class BallSpawner : MonoBehaviour
     public Ball SpawnBall(int hitPoint = 1, bool initialDirection = false, float horizontalSpeed = 1f, float bounceHeight = 8f)
     {
         float positionX = 3.5f * (initialDirection ? 1 : -1);
-        Vector3 spawnPosition = new Vector3(positionX, transform.position.y, 0);
+        Vector3 spawnPosition = new Vector3(positionX, GameConstants.MAX_GAME_AREA_HEIGHT + 0.5f, 0);
 
-        Ball ball = GetBallFromPool();
+        Ball ball = GameController.GetBallFromPool();
         ball.transform.position = spawnPosition;
         ball.SetHitPoint(hitPoint);
         ball.SetIsLeft(initialDirection);
@@ -66,9 +57,9 @@ public class BallSpawner : MonoBehaviour
     /// <param name="hitPoint">Hit point of the ball.</param>
     public Ball SpawnBall(Ball parent, int hitPoint = 1, bool initialDirection = false, float horizontalSpeed = 1f, float bounceHeight = 9f)
     {
-        Vector3 spawnPosition =  parent.transform.position;
+        Vector3 spawnPosition = parent.transform.position;
 
-        Ball ball = GetBallFromPool();
+        Ball ball = GameController.GetBallFromPool();
         ball.transform.position = spawnPosition;
         ball.SetHitPoint(hitPoint);
         ball.SetIsLeft(initialDirection);
@@ -78,38 +69,4 @@ public class BallSpawner : MonoBehaviour
 
         return ball;
     }
-
-    /// <summary>
-    /// Gets available ball from pool. If there is no available ball, expands pool for future requests by 30%.
-    /// </summary>
-    /// <returns></returns>
-    Ball GetBallFromPool()
-    {
-        var pool = ballPool.Where(item => item.gameObject.activeInHierarchy == false);
-
-        if (pool.Count<Ball>() > 0)
-            return pool.First();
-        else
-        {
-            ExpandThePool(Mathf.CeilToInt(ballPool.Count * 0.3f));
-            return GetBallFromPool();
-        }
-    }
-
-    void InitializePool()
-    {
-        ExpandThePool(ballPreloadAmount);
-    }
-
-    void ExpandThePool(int amount)
-    {
-        for (int i = 0; i < amount; i++)
-        {
-            GameObject go = Instantiate(ballPrefab);
-            Ball ball = go.GetComponent<Ball>();
-            ballPool.Add(ball);
-        }
-    }
-    
-
 }

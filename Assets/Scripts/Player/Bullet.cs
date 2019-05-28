@@ -8,8 +8,9 @@ public class Bullet : MonoBehaviour
 
     float maxLifetime = 1;
     float currentLifetime = 0;
+    int damage = 1;
 
-    public void OnSpawn()
+    public void OnEnable()
     {
         currentLifetime = 0;
     }
@@ -33,5 +34,15 @@ public class Bullet : MonoBehaviour
             Despawn();
         else
             currentLifetime += Time.deltaTime;
+    }
+
+    public void SetDamage(int damage)
+    {
+        this.damage = damage;
+    }
+
+    public int GetDamage()
+    {
+        return damage;
     }
 }

@@ -24,8 +24,7 @@ public class Ball : MonoBehaviour
 
     void Start()
     {
-        // TODO Set values from config file
-        gravity = -9.8f;
+        gravity = GameController.GetGameData().gravity;
     }
     
     void Update()
@@ -138,7 +137,7 @@ public class Ball : MonoBehaviour
         Bullet bullet = collider.GetComponent<Bullet>();
         bullet.Despawn();
 
-        hitPoint--;
+        hitPoint -= bullet.GetDamage();
 
         if(hitPoint <= 0)
         {
@@ -153,11 +152,11 @@ public class Ball : MonoBehaviour
 
     void Split()
     {
-        var ChildL = BallSpawner.instance.SpawnBall(this, 5, true, 3, bounceHeight);
-        ChildL.Bounce(GameConstants.SPLIT_BOUNCE_HEIGHT);
-        var ChildR = BallSpawner.instance.SpawnBall(this, 5, false, 3, bounceHeight);
-        ChildR.Bounce(GameConstants.SPLIT_BOUNCE_HEIGHT);
-        isParent = false;
+        //var ChildL = BallSpawner.instance.SpawnBall(this, 5, true, 3, bounceHeight);
+        //ChildL.Bounce(GameConstants.SPLIT_BOUNCE_HEIGHT);
+        //var ChildR = BallSpawner.instance.SpawnBall(this, 5, false, 3, bounceHeight);
+        //ChildR.Bounce(GameConstants.SPLIT_BOUNCE_HEIGHT);
+        //isParent = false;
     }
 
     /// <summary>
