@@ -137,8 +137,8 @@ public class Ball : MonoBehaviour
     void OnHitPlayer(Collider collider)
     {
         print("Player hit!");
-        //collider.gameObject.SetActive(false);
-        //GameController.ChangeGameState(GameState.LOST);
+        collider.gameObject.SetActive(false);
+        GameController.ChangeGameState(GameState.LOST);
     }
 
     void OnHitByBullet(Collider collider)
@@ -160,7 +160,6 @@ public class Ball : MonoBehaviour
 
         if (currentHitPoint <= 0)
         {
-            print(currentHitPoint);
             transform.gameObject.SetActive(false);
 
             if (isParent)
@@ -173,7 +172,6 @@ public class Ball : MonoBehaviour
     void Split()
     {
         float horizontalSpeed;
-
         if (!isBallReady)
             horizontalSpeed = 0;
         else

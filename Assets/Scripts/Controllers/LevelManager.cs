@@ -26,8 +26,7 @@ public class LevelManager : MonoBehaviour
             return;
 
         Debug();
-
-        //CheckBallHPs();
+        
         HandleWaves();
     }
 
@@ -68,20 +67,6 @@ public class LevelManager : MonoBehaviour
                 GameController.ChangeGameState(GameState.WIN);
             }
         }
-    }
-
-    void CheckBallHPs()
-    {
-        currentTotalHp = 0;
-        int offset = 0;
-        int currentActiveBallHP = 0;
-        var livingBalls = activeBallsInLevel.Where(b => b.gameObject.activeInHierarchy).Select(b => b).ToList();
-        foreach (Ball ball in livingBalls)
-        {
-            offset += ball.GetMaxHitPoint();
-            currentActiveBallHP += ball.GetCurrentHitPoint();
-        }
-        currentTotalHp = (maxTotalHp - offset) + currentActiveBallHP;
     }
 
     void SpawnNextBall()
