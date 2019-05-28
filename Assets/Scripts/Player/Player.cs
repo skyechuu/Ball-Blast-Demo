@@ -14,6 +14,11 @@ public class Player : MonoBehaviour
     
     float nextShootTime;
     Vector3 currentVelocity;
+
+    void Start()
+    {
+        GameController.instance.SetPlayer(this);
+    }
     
     void Update()
     {

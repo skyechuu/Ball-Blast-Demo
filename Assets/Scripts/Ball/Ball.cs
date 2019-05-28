@@ -14,6 +14,8 @@ public class Ball : MonoBehaviour
 
     bool isBallReady = false;
     bool isParent = false;
+    int leftChildHP = 1;
+    int rightChildHP = 1;
     float velocityY;
     float velocityX;
 
@@ -29,12 +31,9 @@ public class Ball : MonoBehaviour
     
     void Update()
     {
-#if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.Space))
-            Bounce();
-#endif
-
         CheckBallReadiness();
+
+        Debug();
 
         Move();
     }
@@ -61,6 +60,9 @@ public class Ball : MonoBehaviour
             case "Bullet":
                 OnHitByBullet(collider);
                 break;
+            case "Player":
+                OnHitPlayer(collider);
+                break;
         }
     }
 
@@ -85,6 +87,7 @@ public class Ball : MonoBehaviour
     /// </summary>
     void Bounce()
     {
+        GameController.Shake(0.03f, 0.05f);
         Bounce(bounceHeight);
     }
 
@@ -129,7 +132,14 @@ public class Ball : MonoBehaviour
     void OnSidewayBounce()
     {
         // callback for sound, gfx, etc...
-        //Debug.Log("Boink!");
+        GameController.Shake(0.01f, 0.02f);
+    }
+
+    void OnHitPlayer(Collider collider)
+    {
+        print("Player hit!");
+        collider.gameObject.SetActive(false);
+        GameController.ChangeGameState(GameState.LOST);
     }
 
     void OnHitByBullet(Collider collider)
@@ -137,9 +147,11 @@ public class Ball : MonoBehaviour
         Bullet bullet = collider.GetComponent<Bullet>();
         bullet.Despawn();
 
-        hitPoint -= bullet.GetDamage();
+        var damage =  bullet.GetDamage();
+        hitPoint -= damage;
+        GameController.LevelManager.CurrentTotalHP -= damage;
 
-        if(hitPoint <= 0)
+        if (hitPoint <= 0)
         {
             transform.gameObject.SetActive(false);
 
@@ -152,11 +164,11 @@ public class Ball : MonoBehaviour
 
     void Split()
     {
-        //var ChildL = BallSpawner.instance.SpawnBall(this, 5, true, 3, bounceHeight);
-        //ChildL.Bounce(GameConstants.SPLIT_BOUNCE_HEIGHT);
-        //var ChildR = BallSpawner.instance.SpawnBall(this, 5, false, 3, bounceHeight);
-        //ChildR.Bounce(GameConstants.SPLIT_BOUNCE_HEIGHT);
-        //isParent = false;
+        var ChildL = GameController.LevelManager.SpawnBall(this, leftChildHP, true, 4, bounceHeight);
+        ChildL.Bounce(GameConstants.SPLIT_BOUNCE_HEIGHT);
+        var ChildR = GameController.LevelManager.SpawnBall(this, rightChildHP, false, 4, bounceHeight);
+        ChildR.Bounce(GameConstants.SPLIT_BOUNCE_HEIGHT);
+        isParent = false;
     }
 
     /// <summary>
@@ -172,7 +184,7 @@ public class Ball : MonoBehaviour
         Vector3 pos = transform.position;
         Vector3 size = transform.localScale;
 
-        isBallReady = (pos.x >= platformLeft + size.x) && (pos.x <= platformRight - size.x);
+        isBallReady = (pos.x >= platformLeft + size.x/2) && (pos.x <= platformRight - size.x/2);
     }
 
     private void ResetBall()
@@ -206,9 +218,21 @@ public class Ball : MonoBehaviour
         this.hitPoint = hitPoint;
     }
 
-    public void SetIsParent(bool isParent)
+    public void SetParent(int leftChildHP, int rightChildHP)
     {
-        this.isParent = isParent;
+        this.isParent = true;
+        this.leftChildHP = leftChildHP;
+        this.rightChildHP = rightChildHP;
     }
+
+    public void Debug()
+    {
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.Space))
+            GameController.Shake(0.03f, 0.05f);
+            //Bounce();
+#endif
+    }
+
 
 }
