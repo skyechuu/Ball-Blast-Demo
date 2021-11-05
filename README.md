@@ -1,4 +1,4 @@
-# Bigger Games Game Development Case
+# Ball Blast Game Development Case
 
 **Description:**  Simpler version of the game Ball Blast by Voodoo in 3D
 
